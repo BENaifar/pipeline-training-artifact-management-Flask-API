@@ -42,52 +42,41 @@ class ModelTrainer:
                                                     eval_metric="logloss",
                                                     n_jobs=1,
                                                     tree_method="hist",
-                                                    predictor="cpu_predictor",
                                                     random_state=42),
                                 'gb': GradientBoostingClassifier(random_state=42),
                                 'knn': KNeighborsClassifier(),
-                                'lr1': LogisticRegression(random_state=42),
-                                'lr2': LogisticRegression(random_state=42)
+
                             }
             param_grid = {
-                'lr1': {
-                    'solver': ['lbfgs', 'sag'],
-                    'penalty': ['l2'],
-                    'C': np.logspace(-4, 2, 20)
-                },
-                'lr2': {
-                    'solver': ['liblinear'],
-                    'penalty': ['l1', 'l2'],
-                    'C': np.logspace(-4, 2, 20)
+                'gb': {
+                    'n_estimators': range(50, 301, 20),
+                    'learning_rate': np.linspace(0.01, 1, 15),
+                    'max_depth': range(5, 10),
+                    'min_samples_leaf': np.linspace(0.01, 0.95, 15),
+                    'subsample': [0.8, 1.0],
+                    'max_features': ['sqrt', 'log2', None]
                 },
                 'knn': {
-                    "n_neighbors": list(range(10, 16)),
-                    "weights": ["uniform"],
-                    "metric": ["minkowski"],
-                },
-                'gb': {
-                    'learning_rate': [0.01, 0.03, 0.05, 0.07],
-                    'n_estimators': [300, 400, 500],
-                    'min_samples_leaf': [1, 2, 5],
-                    'max_depth': [3, 4],
-                    'subsample': [0.8, 0.9, 1.0]
+                    'n_neighbors': list(range(1, 21)),
+                    'weights': ['uniform', 'distance'],
+                    'metric': ['euclidean', 'manhattan', 'minkowski']
                 },
                 'xgb': {
-                    "n_estimators": [350, 450, 500],
-                    "learning_rate": [0.01, 0.05, 0.1, 0.2],
-                    "max_depth": [6, 7, 8],
-                    "gamma": [2.0, 3.0],
-                    "subsample": [0.8],
-                    "colsample_bytree": [0.6, 0.8],
-                    "reg_alpha": [0.1, 0.3, 0.5, 0.7],
-                    "reg_lambda": [0.1, 0.3, 0.5, 0.7]
+                    'n_estimators': range(50, 500, 20),          # number of boosting rounds
+                    'max_depth': range(2, 10),               # tree depth
+                    'learning_rate': np.linspace(0.01, 0.3, 20),       # step size shrinkage
+                    'subsample': [0.8, 1],            # row sampling
+                    'colsample_bytree': np.linspace(0, 0.9, 15),     # feature sampling
+                    'gamma': np.linspace(0, 5, 30),                    # min loss reduction
+                    'reg_alpha': np.linspace(0, 1, 15),                # L1 regularization
+                    'reg_lambda': np.linspace(0, 1, 15)               # L2 regularization
                 },
                 'rf': {
-                    "n_estimators": [300, 400, 500],
-                    "max_depth": [5, 8],
-                    "min_samples_split": [5, 10, 20],
-                    "min_samples_leaf": [1, 2],
-                    "max_features": [0.5, 0.7, "sqrt", "log2"],
+                    'n_estimators': [200, 300, 500],   # stability > brute force
+                    'max_depth': [None, 5, 8, 12, 16], # MOST important parameter
+                    'min_samples_split': [2, 5, 10, 20],
+                    'min_samples_leaf': [1, 2, 5, 10],
+                    'max_features': ['sqrt', 'log2', 0.3, 0.5, 0.7],
                 }
 
             }
@@ -100,7 +89,7 @@ class ModelTrainer:
 
             best_model = models_report[best_model_name][0]
 
-            logging.info("Best model Found")
+            logging.info("Best model Found:" + best_model_name)
 
             save_object(
                 file_path=self.model_trainer_config.trained_model_file_path,
