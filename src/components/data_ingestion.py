@@ -9,6 +9,8 @@ from dataclasses import dataclass
 
 from src.components.data_transformation import DataTransformation
 from src.components.data_transformation import DataTransformationConfig
+from src.components.model_trainer import ModelTrainerConfig
+from src.components.model_trainer import ModelTrainer
 
 @dataclass
 class DataIngestionConfig:
@@ -31,7 +33,22 @@ class DataIngestion:
             df.to_csv(self.ingestion_config.raw_data_path, index=False, header=True)
 
             logging.info('Train test split initiated')
-            train_set, test_set= train_test_split(df, test_size=0.2, random_state=42)
+
+            X = df.drop(columns=['Survived'], axis=1)
+            y = df['Survived']
+            X_train, X_test, y_train, y_test = train_test_split(
+                                                X,
+                                                y,
+                                                test_size=0.2,
+                                                random_state=42,
+                                                shuffle=True
+                                            )
+            
+            train_set = X_train.copy()
+            train_set["Survived"] = y_train
+
+            test_set = X_test.copy()
+            test_set["Survived"] = y_test
 
             train_set.to_csv(self.ingestion_config.train_data_path, index=False, header=True)
 
@@ -51,4 +68,7 @@ if __name__== '__main__':
     train_data, test_data = obj.initiate_data_ingestion()
 
     data_transformation = DataTransformation()
-    data_transformation.init_data_transformation(train_data, test_data)
+    train_arr, test_arr = data_transformation.init_data_transformation(train_data, test_data)
+    
+    modeltrainer=ModelTrainer()
+    print(modeltrainer.initiate_model_training(train_arr, test_arr))
