@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Predict Titanic Survival</title>
+		<style>
+			/* Reset some default styles */
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+			}
+
+			body {
+				background-color: #f5f7fa;
+				color: #333;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-height: 100vh;
+				padding: 20px;
+			}
+
+			.container {
+				background-color: #fff;
+				padding: 40px;
+				border-radius: 12px;
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+				width: 100%;
+				max-width: 500px;
+			}
+
+			h1 {
+				text-align: center;
+				margin-bottom: 30px;
+				color: #2c3e50;
+			}
+
+			form {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+			}
+
+			label {
+				font-weight: 600;
+				margin-bottom: 5px;
+				display: block;
+			}
+
+			input[type="text"],
+			input[type="number"],
+			select {
+				width: 100%;
+				padding: 10px 12px;
+				border: 1px solid #ccc;
+				border-radius: 8px;
+				transition: all 0.3s ease;
+				font-size: 16px;
+			}
+
+			input[type="text"]:focus,
+			input[type="number"]:focus,
+			select:focus {
+				border-color: #3498db;
+				outline: none;
+				box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+			}
+
+			input[type="submit"] {
+				background-color: #3498db;
+				color: #fff;
+				padding: 12px;
+				border: none;
+				border-radius: 8px;
+				cursor: pointer;
+				font-size: 18px;
+				transition: background-color 0.3s ease;
+			}
+
+			input[type="submit"]:hover {
+				background-color: #2980b9;
+			}
+
+			h2 {
+				text-align: center;
+				margin-top: 20px;
+				color: #27ae60;
+			}
+
+			a {
+				display: block;
+				text-align: center;
+				margin-top: 20px;
+				color: #3498db;
+				text-decoration: none;
+				font-weight: 600;
+				transition: color 0.3s ease;
+			}
+
+			a:hover {
+				color: #2980b9;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Predict Titanic Survival</h1>
+			<form method="POST">
+				<label>Pclass:</label>
+				<select name="Pclass">
+					<option value="">-- Select --</option>
+					<option value="1" {% if form_data and form_data.Pclass == '1' %}selected{% endif %}>1</option>
+					<option value="2" {% if form_data and form_data.Pclass == '2' %}selected{% endif %}>2</option>
+					<option value="3" {% if form_data and form_data.Pclass == '3' %}selected{% endif %}>3</option>
+				</select>
+				{% if errors and errors.Pclass %}
+					<span style="color:red">{{ errors.Pclass[0] }}</span>
+				{% endif %}
+
+				<label>Name:</label>
+				<input type="text" name="Name" value="{{ form_data.Name if form_data else '' }}" />
+				{% if errors and errors.Name %}
+					<span style="color:red">{{ errors.Name[0] }}</span>
+				{% endif %}
+
+				<label>Sex:</label>
+				<select name="Sex">
+					<option value="">-- Select --</option>
+					<option value="male" {% if form_data and form_data.Sex == 'male' %}selected{% endif %}>Male</option>
+					<option value="female" {% if form_data and form_data.Sex == 'female' %}selected{% endif %}>Female</option>
+				</select>
+				{% if errors and errors.Sex %}
+					<span style="color:red">{{ errors.Sex[0] }}</span>
+				{% endif %}
+
+				<label>Age:</label>
+				<input type="number" step="0.1" name="Age" value="{{ form_data.Age if form_data else '' }}" />
+				{% if errors and errors.Age %}
+					<span style="color:red">{{ errors.Age[0] }}</span>
+				{% endif %}
+
+				<label>SibSp:</label>
+				<input type="number" min="0" name="SibSp" value="{{ form_data.SibSp if form_data else '' }}" />
+				{% if errors and errors.SibSp %}
+					<span style="color:red">{{ errors.SibSp[0] }}</span>
+				{% endif %}
+
+				<label>Parch:</label>
+				<input type="number" min="0" name="Parch" value="{{ form_data.Parch if form_data else '' }}" />
+				{% if errors and errors.Parch %}
+					<span style="color:red">{{ errors.Parch[0] }}</span>
+				{% endif %}
+
+				<label>Ticket:</label>
+				<input type="text" name="Ticket" value="{{ form_data.Ticket if form_data else '' }}" />
+				{% if errors and errors.Ticket %}
+					<span style="color:red">{{ errors.Ticket[0] }}</span>
+				{% endif %}
+
+				<label>Fare:</label>
+				<input type="number" step="0.01" min="0" name="Fare" value="{{ form_data.Fare if form_data else '' }}" />
+				{% if errors and errors.Fare %}
+					<span style="color:red">{{ errors.Fare[0] }}</span>
+				{% endif %}
+
+				<label>Cabin:</label>
+				<input type="text" name="Cabin" value="{{ form_data.Cabin if form_data else '' }}" />
+				{% if errors and errors.Cabin %}
+					<span style="color:red">{{ errors.Cabin[0] }}</span>
+				{% endif %}
+
+				<label>Embarked:</label>
+				<select name="Embarked">
+					<option value="">-- Select --</option>
+					<option value="C" {% if form_data and form_data.Embarked == 'C' %}selected{% endif %}>C</option>
+					<option value="Q" {% if form_data and form_data.Embarked == 'Q' %}selected{% endif %}>Q</option>
+					<option value="S" {% if form_data and form_data.Embarked == 'S' %}selected{% endif %}>S</option>
+				</select>
+				{% if errors and errors.Embarked %}
+					<span style="color:red">{{ errors.Embarked[0] }}</span>
+				{% endif %}
+
+				<input type="submit" value="Predict" />
+			</form>
+
+			{% if results is defined %}
+				<h2>Prediction Result: {{ results }}</h2>
+			{% endif %}
+
+
+
+			<a href="/">Back to Home</a>
+		</div>
+	</body>
+</html>

@@ -46,7 +46,7 @@ class TitleCreator(BaseEstimator, TransformerMixin):
     def extract_title_df(self, X):
         titles = X[self.col].apply(
             lambda name: re.search(r",\s*([^\.]+)\.", name).group(1)
-            if pd.notnull(name) else None
+            if pd.notnull(name) and re.search(r",\s*([^\.]+)\.", name) else None
         )
         return titles.to_frame(name='Title')
 
