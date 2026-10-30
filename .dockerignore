@@ -1,0 +1,8 @@
+venv/
+.git/
+.vscode/
+logs/
+notebook/
+__pycache__/
+*.egg-info/
+*.ipynb
